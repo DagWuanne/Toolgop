@@ -153,7 +153,7 @@ def Nhap_Cookie():
     i = 0
     while True:
         i += 1
-        cookie = Prompt.ask(f"[cyan][>] => [/cyan][green]Nhập Cookie Facebook Thứ: {i}[/green]")
+        cookie = Prompt.ask(f"[cyan]=> [/cyan][green]Nhập Cookie Facebook Thứ: {i}[/green]")
         if not cookie and i > 1:
             break
         fb = Facebook_Api(cookie)
@@ -189,7 +189,7 @@ def main():
                     "Nhập [1] Giữ Access Token | Nhập [2] Nhập Mới",
                     style="blue", title="LỰA CHỌN"
                 ))
-                chon = Prompt.ask("[cyan][>] => [/cyan][green]Nhập ===>[/green]")
+                chon = Prompt.ask("[cyan]=> [/cyan][green]Nhập ===>[/green]")
                 if chon == '2':
                     os.remove('configtds.txt')
                 elif chon == '1':
