@@ -113,26 +113,41 @@ class TraoDoiSub_Api:
 
 # ────────── BANNER VÀ GIAO DIỆN ──────────
 def banner():
-    clear_screen()
-    logo = [
-        "╔════════════════════╗",
-        "║      TOOL TDS      ║",
-        "╚════════════════════╝"
-    ]
-    logo_panel = Panel.fit("\n".join(logo), style="cyan", title="[bold white]THÔNG TIN TOOL", border_style="green")
-    
-    contact_panel = Panel.fit(
-        "YouTube: https://www.youtube.com/channel/UCGJmaIZ_JbAwoOrHeBZru6A\n"
-        "Zalo: https://zalo.me/g/wyboil196",
-        style="yellow", title="[bold white]LIÊN HỆ", border_style="blue"
+    # Panel thông tin admin (kèm Tool by...)
+    admin_panel = Panel.fit(
+        """[bold blue]Tool by:[/] [bold pink]Đăng Quân [bold green]x [bold red]Đăng Khoa
+        
+[bold cyan]Facebook Admin 1:[/] facebook.com/admin1
+[bold cyan]Facebook Admin 2:[/] facebook.com/admin2
+[bold yellow]Zalo Admin:[/] 039xxxx / 039xxxx
+[bold red]YouTube:[/] youtube.com/xxxx
+[bold blue]Box Zalo:[/] zalo.me/xxx""",
+        title="[bold white]Liên hệ Admin",
+        border_style="green"
     )
-    
-    console.print(Columns([logo_panel, contact_panel]))
-    console.print(Panel.fit(
-        f"Thời gian hiện tại: {datetime.now().strftime('%H:%M:%S')} - {datetime.now().strftime('%d/%m/%Y')}",
-        style="magenta", title="[bold white]THÔNG TIN"
-    ))
 
+    # Lấy thời gian hiện tại
+    now = datetime.now()
+    time_str = now.strftime("%H:%M:%S")
+    date_str = now.strftime("%d/%m/%Y")
+
+    # Chuyển sang lịch âm
+    solar = Solar(now.year, now.month, now.day)
+    lunar = Converter.Solar2Lunar(solar)
+    lunar_str = f"{lunar.day}/{lunar.month}/{lunar.year} (Âm lịch)"
+
+    # Panel thời gian & ngày tháng
+    time_panel = Panel.fit(
+        f"[bold cyan]⏰ Giờ hiện tại:[/] {time_str}\n"
+        f"[bold green]📅 Dương lịch:[/] {date_str}\n"
+        f"[bold magenta]🌙 Âm lịch:[/] {lunar_str}",
+        title="[bold white]🕓 Thời Gian",
+        border_style="bright_blue"
+    )
+
+    # Hiển thị song song 2 cột
+    console.print(Columns([admin_panel, time_panel]))
+    
 def Nhap_Cookie():
     list_cookie = []
     i = 0
