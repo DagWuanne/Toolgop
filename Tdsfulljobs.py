@@ -95,7 +95,38 @@ class Facebook_Api:
         except:
             return 0
 
-    # (Các hàm follow, page, group, reac_cmt, like, comment, share giữ nguyên như mã gốc)
+    def follow(self, id):
+        data = {
+            'av': self.user_id, '__user': self.user_id, '__a': '1', 'fb_dtsg': self.fb_dtsg,
+            'jazoest': self.jazoest, 'lsd': 'avkT3cHA', 'uid': id
+        }
+        try:
+            response = requests.post(f'https://mbasic.facebook.com/a/subscribe.php?profile_id={id}', headers=self.headers, data=data)
+            return "Thành công" in response.text
+        except:
+            return False
+
+    def like(self, id):
+        data = {
+            'fb_dtsg': self.fb_dtsg, 'jazoest': self.jazoest, 'ft_id': id,
+            'action_type': 'like'
+        }
+        try:
+            response = requests.post(f'https://mbasic.facebook.com/reactions/picker/?ft_id={id}', headers=self.headers, data=data)
+            return "Thành công" in response.text
+        except:
+            return False
+
+    def comment(self, id, message):
+        data = {
+            'fb_dtsg': self.fb_dtsg, 'jazoest': self.jazoest, 'comment_text': message,
+            'comment_action': 'submit', 'post_id': id
+        }
+        try:
+            response = requests.post(f'https://mbasic.facebook.com/{id}', headers=self.headers, data=data)
+            return "Thành công" in response.text
+        except:
+            return False
 
 # ────────── LỚP TRAO ĐỔI SUB API ──────────
 class TraoDoiSub_Api:
@@ -109,11 +140,22 @@ class TraoDoiSub_Api:
         except:
             return False
 
-    # (Các hàm run, get_job, nhan_xu giữ nguyên như mã gốc)
+    def get_job(self, type_job):
+        try:
+            response = requests.get(f'https://traodoisub.com/api/?fields=job&access_token={self.token}&type={type_job}').json()
+            return response['data'] if 'data' in response else False
+        except:
+            return False
+
+    def nhan_xu(self, job_id):
+        try:
+            response = requests.get(f'https://traodoisub.com/api/nhanxu.php?access_token={self.token}&id={job_id}').json()
+            return response['status'] if 'status' in response else False
+        except:
+            return False
 
 # ────────── BANNER VÀ GIAO DIỆN ──────────
 def banner():
-    # Panel thông tin admin (kèm Tool by...)
     admin_panel = Panel.fit(
         """[bold blue]Tool by:[/] [bold pink]Đăng Quân [bold green]x [bold red]Đăng Khoa
         
@@ -126,17 +168,14 @@ def banner():
         border_style="green"
     )
 
-    # Lấy thời gian hiện tại
     now = datetime.now()
     time_str = now.strftime("%H:%M:%S")
     date_str = now.strftime("%d/%m/%Y")
 
-    # Chuyển sang lịch âm
     solar = Solar(now.year, now.month, now.day)
     lunar = Converter.Solar2Lunar(solar)
     lunar_str = f"{lunar.day}/{lunar.month}/{lunar.year} (Âm lịch)"
 
-    # Panel thời gian & ngày tháng
     time_panel = Panel.fit(
         f"[bold cyan]⏰ Giờ hiện tại:[/] {time_str}\n"
         f"[bold green]📅 Dương lịch:[/] {date_str}\n"
@@ -145,7 +184,6 @@ def banner():
         border_style="bright_blue"
     )
 
-    # Hiển thị song song 2 cột
     console.print(Columns([admin_panel, time_panel]))
     
 def Nhap_Cookie():
@@ -228,7 +266,86 @@ def main():
             style="blue", title="THÔNG TIN TÀI KHOẢN"
         ))
 
-        # (Phần nhập cookie và chạy nhiệm vụ giữ nguyên logic, chỉ thay đổi giao diện bằng Panel)
+        # Nhập cookie và chạy nhiệm vụ
+        cookies = Nhap_Cookie()
+        if not cookies:
+            console.print(Panel.fit(
+                "Không có cookie nào được nhập! Thoát tool.",
+                style="red", title="LỖI"
+            ))
+            break
+
+        # Chạy các nhiệm vụ
+        job_types = ['follow', 'like', 'comment']  # Các loại nhiệm vụ mẫu
+        dem = 0
+        while True:
+            for cookie in cookies:
+                fb = Facebook_Api(cookie)
+                for job_type in job_types:
+                    job = tds.get_job(job_type)
+                    if job and len(job) > 0:
+                        job_id = random.choice(job)['id']
+                        if job_type == 'follow':
+                            if fb.follow(job_id):
+                                dem += 1
+                                hoanthanh(dem, job_id, 'Follow', 'Hoàn thành', xu)
+                                if tds.nhan_xu(job_id):
+                                    console.print(Panel.fit(
+                                        f"Nhận {xu} xu thành công cho job {job_id}",
+                                        style="green", title="THÀNH CÔNG"
+                                    ))
+                                nghingoi(5, 10)
+                            else:
+                                error(job_id, 'Follow')
+                                chongblock(10)
+                        elif job_type == 'like':
+                            if fb.like(job_id):
+                                dem += 1
+                                hoanthanh(dem, job_id, 'Like', 'Hoàn thành', xu)
+                                if tds.nhan_xu(job_id):
+                                    console.print(Panel.fit(
+                                        f"Nhận {xu} xu thành công cho job {job_id}",
+                                        style="green", title="THÀNH CÔNG"
+                                    ))
+                                nghingoi(5, 10)
+                            else:
+                                error(job_id, 'Like')
+                                chongblock(10)
+                        elif job_type == 'comment':
+                            message = f"Comment {random.randint(1, 100)}"
+                            if fb.comment(job_id, message):
+                                dem += 1
+                                hoanthanh(dem, job_id, 'Comment', 'Hoàn thành', xu)
+                                if tds.nhan_xu(job_id):
+                                    console.print(Panel.fit(
+                                        f"Nhận {xu} xu thành công cho job {job_id}",
+                                        style="green", title="THÀNH CÔNG"
+                                    ))
+                                nghingoi(5, 10)
+                            else:
+                                error(job_id, 'Comment')
+                                chongblock(10)
+                    else:
+                        console.print(Panel.fit(
+                            f"Không tìm thấy job {job_type}!",
+                            style="yellow", title="THÔNG BÁO"
+                        ))
+                        time.sleep(5)
+            
+            # Hỏi xem muốn tiếp tục hoặc thoát
+            console.print(Panel.fit(
+                "[bold cyan]Nhấn Enter để tiếp tục, hoặc nhập 'q' để thoát.[/bold cyan]",
+                title="🔄 QUAY LẠI", border_style="bright_blue"
+            ))
+            choice = Prompt.ask("[bold yellow]👉 Lựa chọn của bạn[/bold yellow]").strip().lower()
+            if choice == 'q':
+                console.print(Panel.fit(
+                    "[red]Đã thoát tool![/red]",
+                    title="❌ THOÁT", border_style="red"
+                ))
+                sleep(1)
+                break
+            clear_screen()
 
 if __name__ == '__main__':
     main()
