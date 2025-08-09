@@ -19,7 +19,8 @@ from rich.columns import Columns
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from datetime import datetime
 from lunarcalendar import Converter, Solar  # Thêm để hỗ trợ lịch âm
-
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 # Vô hiệu hóa cảnh báo bảo mật và logging
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -3419,6 +3420,7 @@ def send_otp_with_delay(func, phone, delay):
     time.sleep(random.uniform(1, 2))
 
 # Lấy số điện thoại và độ trễ từ dòng lệnh
+clear_screen()
 banner()
 phone = input("Nhập số điện thoại: ")
 delay = float(5)
@@ -3543,4 +3545,5 @@ if __name__ == "__main__":
 # https://moneygo.vn/
 # https://pico.vn
 # https://www.pnj.com.vn/
+
 # https://prod-tini-id.nkidworks.com/auth/tinizen
