@@ -10,7 +10,7 @@ console = Console()
 # Thông báo cập nhật tool
 console.print(
     Panel.fit(
-        "[bold red]🚧 Tool TDS TIKTOK NOW đang được cập nhật. Vui lòng quay lại sau! 🚧",
+        "[bold red]🚧 Tool này đang được cập nhật. Vui lòng quay lại sau! 🚧",
         title="[bold yellow]Thông Báo",
         border_style="red"
     )
